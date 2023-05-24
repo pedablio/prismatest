@@ -10,32 +10,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Customer {
-  id           Int       @id @default(autoincrement())
-  cpfCnpj      String    @db.VarChar(14)
-  name         String    @db.VarChar(80)
-  birthDate    DateTime? @db.Timestamptz(6)
-  phone        String?   @db.VarChar(11)
-  email        String?   @db.VarChar(255)
-  note         String?   @db.VarChar(250)
-  passwordHash String    @db.VarChar(100)
-  createdAt    DateTime  @db.Timestamptz(6)
-  balance      Decimal   @db.Decimal(19, 4)
-  phone2       String?   @db.VarChar(11)
-  streetName   String?   @db.VarChar(50)
-  streetNumber String?   @db.VarChar(10)
-  district     String?   @db.VarChar(80)
-  city         String?   @db.VarChar(50)
-  state        String?   @db.VarChar(2)
-  postalCode   String?   @db.VarChar(8)
-  complement   String?   @db.VarChar(50)
+model City {
+  id    Int    @id
+  name  String @db.VarChar(150)
+  state String @db.VarChar(2)
 
-  @@map("customer")
+  plateInspections PlateInspection[]
+
+  @@map("city")
 }
 
-model Situation {
-  id          Int    @id
-  description String @db.VarChar(35)
+model PlateInspection {
+  id         String   @id @db.Uuid
+  plate      String   @db.Char(7)
+  createdAt  DateTime @db.Timestamptz(6)
+  number     Int
+  sequential Int
+  cityId     Int
 
-  @@map("situation")
+  city City @relation(fields: [cityId], references: [id])
+
+  @@unique([cityId, sequential])
+  @@index([plate, sequential, cityId])
+  @@map("plate_inspection")
 }

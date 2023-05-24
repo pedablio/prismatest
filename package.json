@@ -4,7 +4,10 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "dev": "tsx src/server.ts"
+    "dev": "tsx src/server.ts",
+    "test:knex": "loadtest -n 500 -c 10 http://127.0.0.1:5000/knex",
+    "test:prisma": "loadtest -n 500 -c 10 http://127.0.0.1:5000/prisma",
+    "test:prismaraw": "loadtest -n 500 -c 10 http://127.0.0.1:5000/prisma-raw"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +16,7 @@
     "@rocketseat/eslint-config": "^1.2.0",
     "@types/node": "^20.2.3",
     "eslint": "^8.41.0",
+    "loadtest": "^5.2.0",
     "prisma": "^4.14.1",
     "tsx": "^3.12.7",
     "typescript": "^5.0.4"
@@ -20,7 +24,10 @@
   "dependencies": {
     "@prisma/client": "^4.14.1",
     "axios": "^1.4.0",
+    "date-fns": "^2.30.0",
     "dotenv": "^16.0.3",
-    "fastify": "^4.17.0"
+    "fastify": "^4.17.0",
+    "knex": "^2.4.2",
+    "pg": "^8.11.0"
   }
 }
