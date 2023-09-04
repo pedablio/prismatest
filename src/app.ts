@@ -7,50 +7,62 @@ import { knexClient } from './knex'
 const app = fastify({ ignoreTrailingSlash: true, caseSensitive: false })
 
 app.get('/prisma-raw', async () => {
-  const items = await prisma.$transaction((prismaTransaction) =>
-    prismaTransaction.$queryRawUnsafe(
-      `SELECT "id", "number", "createdAt", "sequential"
+  try {
+    const items = await prisma.$transaction((prismaTransaction) =>
+      prismaTransaction.$queryRawUnsafe(
+        `SELECT "id", "number", "createdAt", "sequential"
       FROM "plate_inspection"
       WHERE "plate" = $1
       AND "cityId" = $2
       AND "createdAt" + '300 minute' >= NOW()
       ORDER BY "createdAt" DESC`,
-      generatePlate(),
-      randomIntFromInterval(1, 10),
-    ),
-  )
+        generatePlate(),
+        randomIntFromInterval(1, 10),
+      ),
+    )
 
-  console.log(items)
+    console.log(items)
+  } catch (error) {
+    console.log(error)
+  }
 })
 
 app.get('/prisma', async () => {
-  const items = await prisma.$transaction((prismaTransaction) =>
-    prismaTransaction.plateInspection.findMany({
-      where: {
-        plate: generatePlate(),
-        cityId: randomIntFromInterval(1, 10),
-        createdAt: { gte: subMinutes(new Date(), 300) },
-      },
-      select: { id: true, number: true, createdAt: true, sequential: true },
-      orderBy: { createdAt: 'desc' },
-    }),
-  )
+  try {
+    const items = await prisma.$transaction((prismaTransaction) =>
+      prismaTransaction.plateInspection.findMany({
+        where: {
+          plate: generatePlate(),
+          cityId: randomIntFromInterval(1, 10),
+          createdAt: { gte: subMinutes(new Date(), 300) },
+        },
+        select: { id: true, number: true, createdAt: true, sequential: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+    )
 
-  console.log(items)
+    console.log(items)
+  } catch (error) {
+    console.log(error)
+  }
 })
 
 app.get('/knex', async () => {
-  const items = await knexClient.transaction((knexTransaction) =>
-    knexTransaction
-      .select('id', 'number', 'createdAt', 'sequential')
-      .from('plate_inspection')
-      .where('plate', generatePlate())
-      .andWhere('cityId', randomIntFromInterval(1, 10))
-      .andWhere(knexTransaction.raw(`"createdAt" + '300 minute' >= NOW()`))
-      .orderBy('createdAt', 'desc'),
-  )
+  try {
+    const items = await knexClient.transaction((knexTransaction) =>
+      knexTransaction
+        .select('id', 'number', 'createdAt', 'sequential')
+        .from('plate_inspection')
+        .where('plate', generatePlate())
+        .andWhere('cityId', randomIntFromInterval(1, 10))
+        .andWhere(knexTransaction.raw(`"createdAt" + '300 minute' >= NOW()`))
+        .orderBy('createdAt', 'desc'),
+    )
 
-  console.log(items)
+    console.log(items)
+  } catch (error) {
+    console.log(error)
+  }
 })
 
 function randomIntFromInterval(min: number, max: number) {

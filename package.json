@@ -13,21 +13,21 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@rocketseat/eslint-config": "^1.2.0",
-    "@types/node": "^20.2.3",
-    "eslint": "^8.41.0",
-    "loadtest": "^5.2.0",
-    "prisma": "^4.14.1",
-    "tsx": "^3.12.7",
-    "typescript": "^5.0.4"
+    "@rocketseat/eslint-config": "^2.1.0",
+    "@types/node": "^20.5.9",
+    "eslint": "^8.48.0",
+    "loadtest": "^7.1.0",
+    "prisma": "^5.2.0",
+    "tsx": "^3.12.8",
+    "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@prisma/client": "^4.14.1",
-    "axios": "^1.4.0",
+    "@prisma/client": "^5.2.0",
+    "axios": "^1.5.0",
     "date-fns": "^2.30.0",
-    "dotenv": "^16.0.3",
-    "fastify": "^4.17.0",
-    "knex": "^2.4.2",
-    "pg": "^8.11.0"
+    "dotenv": "^16.3.1",
+    "fastify": "^4.22.2",
+    "knex": "^2.5.1",
+    "pg": "^8.11.3"
   }
 }
