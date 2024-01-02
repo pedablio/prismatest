@@ -3,13 +3,14 @@ import fastify from 'fastify'
 import { prisma } from './prisma'
 import { subMinutes } from 'date-fns'
 import { knexClient } from './knex'
-import postgres from 'postgres'
-import { drizzle } from 'drizzle-orm/postgres-js'
+import { drizzle } from 'drizzle-orm/node-postgres'
+import { Client } from 'pg'
 import { plateInspection } from '../db/schema'
 import { and, desc, eq, sql } from 'drizzle-orm'
 
 const app = fastify({ ignoreTrailingSlash: true, caseSensitive: false })
-const db = drizzle(postgres(process.env.DATABASE_URL ?? ''))
+const client = new Client({ connectionString: process.env.DATABASE_URL })
+client.connect()
 
 app.get('/prisma-raw', async () => {
   try {
@@ -72,6 +73,7 @@ app.get('/knex', async () => {
 
 app.get('/drizzle', async () => {
   try {
+    const db = drizzle(client)
     const items = await db
       .select({
         id: plateInspection.id,
