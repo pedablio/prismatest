@@ -3,8 +3,13 @@ import fastify from 'fastify'
 import { prisma } from './prisma'
 import { subMinutes } from 'date-fns'
 import { knexClient } from './knex'
+import postgres from 'postgres'
+import { drizzle } from 'drizzle-orm/postgres-js'
+import { plateInspection } from '../db/schema'
+import { and, desc, eq, sql } from 'drizzle-orm'
 
 const app = fastify({ ignoreTrailingSlash: true, caseSensitive: false })
+const db = drizzle(postgres(process.env.DATABASE_URL ?? ''))
 
 app.get('/prisma-raw', async () => {
   try {
@@ -58,6 +63,31 @@ app.get('/knex', async () => {
         .andWhere(knexTransaction.raw(`"createdAt" + '300 minute' >= NOW()`))
         .orderBy('createdAt', 'desc'),
     )
+
+    console.log(items)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
+app.get('/drizzle', async () => {
+  try {
+    const items = await db
+      .select({
+        id: plateInspection.id,
+        number: plateInspection.number,
+        createdAt: plateInspection.createdAt,
+        sequential: plateInspection.sequential,
+      })
+      .from(plateInspection)
+      .where(
+        and(
+          eq(plateInspection.plate, generatePlate()),
+          eq(plateInspection.cityId, randomIntFromInterval(1, 10)),
+          sql`${plateInspection.createdAt} + '300 minute' >= NOW()`,
+        ),
+      )
+      .orderBy(desc(plateInspection.createdAt))
 
     console.log(items)
   } catch (error) {
