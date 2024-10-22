@@ -14,7 +14,7 @@ client.connect()
 
 app.get('/prisma-raw', async () => {
   try {
-    const items = await prisma.$transaction((prismaTransaction) =>
+    const items = await prisma.$transaction(prismaTransaction =>
       prismaTransaction.$queryRawUnsafe(
         `SELECT "id", "number", "createdAt", "sequential"
       FROM "plate_inspection"
@@ -33,9 +33,34 @@ app.get('/prisma-raw', async () => {
   }
 })
 
+app.get('/prisma-drizzle', async () => {
+  try {
+    const items = await prisma.$drizzle
+      .select({
+        id: plateInspection.id,
+        number: plateInspection.number,
+        createdAt: plateInspection.createdAt,
+        sequential: plateInspection.sequential,
+      })
+      .from(plateInspection)
+      .where(
+        and(
+          eq(plateInspection.plate, generatePlate()),
+          eq(plateInspection.cityId, randomIntFromInterval(1, 10)),
+          sql`${plateInspection.createdAt} + '300 minute' >= NOW()`,
+        ),
+      )
+      .orderBy(desc(plateInspection.createdAt))
+
+    console.log(items)
+  } catch (error) {
+    console.log(error)
+  }
+})
+
 app.get('/prisma', async () => {
   try {
-    const items = await prisma.$transaction((prismaTransaction) =>
+    const items = await prisma.$transaction(prismaTransaction =>
       prismaTransaction.plateInspection.findMany({
         where: {
           plate: generatePlate(),
@@ -55,7 +80,7 @@ app.get('/prisma', async () => {
 
 app.get('/knex', async () => {
   try {
-    const items = await knexClient.transaction((knexTransaction) =>
+    const items = await knexClient.transaction(knexTransaction =>
       knexTransaction
         .select('id', 'number', 'createdAt', 'sequential')
         .from('plate_inspection')
@@ -74,24 +99,26 @@ app.get('/knex', async () => {
 app.get('/drizzle', async () => {
   try {
     const db = drizzle(client)
-    const items = await db
-      .select({
-        id: plateInspection.id,
-        number: plateInspection.number,
-        createdAt: plateInspection.createdAt,
-        sequential: plateInspection.sequential,
-      })
-      .from(plateInspection)
-      .where(
-        and(
-          eq(plateInspection.plate, generatePlate()),
-          eq(plateInspection.cityId, randomIntFromInterval(1, 10)),
-          sql`${plateInspection.createdAt} + '300 minute' >= NOW()`,
-        ),
-      )
-      .orderBy(desc(plateInspection.createdAt))
+    await db.transaction(async transaction => {
+      const items = await transaction
+        .select({
+          id: plateInspection.id,
+          number: plateInspection.number,
+          createdAt: plateInspection.createdAt,
+          sequential: plateInspection.sequential,
+        })
+        .from(plateInspection)
+        .where(
+          and(
+            eq(plateInspection.plate, generatePlate()),
+            eq(plateInspection.cityId, randomIntFromInterval(1, 10)),
+            sql`${plateInspection.createdAt} + '300 minute' >= NOW()`,
+          ),
+        )
+        .orderBy(desc(plateInspection.createdAt))
 
-    console.log(items)
+      console.log(items)
+    })
   } catch (error) {
     console.log(error)
   }

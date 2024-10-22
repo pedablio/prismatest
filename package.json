@@ -5,33 +5,35 @@
   "main": "main.js",
   "scripts": {
     "dev": "tsx src/server.ts",
-    "test:knex": "loadtest -n 500 -c 10 http://127.0.0.1:5000/knex",
-    "test:prisma": "loadtest -n 500 -c 10 http://127.0.0.1:5000/prisma",
-    "test:prismaraw": "loadtest -n 500 -c 10 http://127.0.0.1:5000/prisma-raw",
-    "test:drizzle": "loadtest -n 500 -c 10 http://127.0.0.1:5000/drizzle"
+    "test:knex": "loadtest -n 500 -c 10 http://127.0.0.1:3333/knex",
+    "test:prisma": "loadtest -n 500 -c 10 http://127.0.0.1:3333/prisma",
+    "test:prismaraw": "loadtest -n 500 -c 10 http://127.0.0.1:3333/prisma-raw",
+    "test:prismadrizzle": "loadtest -n 500 -c 10 http://127.0.0.1:3333/prisma-drizzle",
+    "test:drizzle": "loadtest -n 500 -c 10 http://127.0.0.1:3333/drizzle"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@rocketseat/eslint-config": "^2.1.0",
-    "@types/node": "^20.10.6",
-    "@types/pg": "^8.10.9",
-    "drizzle-kit": "^0.20.9",
-    "eslint": "^8.56.0",
-    "loadtest": "^8.0.6",
-    "prisma": "^5.7.1",
-    "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "@rocketseat/eslint-config": "^2.2.2",
+    "@types/node": "^22.7.7",
+    "@types/pg": "^8.11.10",
+    "drizzle-kit": "^0.26.2",
+    "drizzle-prisma-generator": "^0.1.7",
+    "eslint": "^9.13.0",
+    "loadtest": "^8.0.9",
+    "pg": "^8.13.0",
+    "prisma": "^5.21.1",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.3"
   },
   "dependencies": {
-    "@prisma/client": "^5.7.1",
-    "axios": "^1.6.3",
-    "date-fns": "^3.0.6",
-    "dotenv": "^16.3.1",
-    "drizzle-orm": "^0.29.3",
-    "fastify": "^4.25.2",
-    "knex": "^3.1.0",
-    "pg": "^8.11.3"
+    "@prisma/client": "^5.21.1",
+    "axios": "^1.7.7",
+    "date-fns": "^4.1.0",
+    "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.35.3",
+    "fastify": "^5.0.0",
+    "knex": "^3.1.0"
   }
 }
