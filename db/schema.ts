@@ -1,35 +1,41 @@
-import {
-  char,
-  index,
-  integer,
-  pgTable,
-  serial,
-  timestamp,
-  unique,
-  uuid,
-  varchar,
-} from 'drizzle-orm/pg-core'
+import { relations } from 'drizzle-orm'
+import { foreignKey, integer, pgTable, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core'
 
-export const city = pgTable('city', {
-  id: serial('id').primaryKey(),
-  name: varchar('name', { length: 150 }).notNull(),
-  state: varchar('state', { length: 2 }).notNull(),
-})
+export const City = pgTable('city', {
+	id: integer('id').notNull().primaryKey(),
+	name: text('name').notNull(),
+	state: text('state').notNull()
+});
 
-export const plateInspection = pgTable(
-  'plate_inspection',
-  {
-    id: uuid('id').primaryKey(),
-    plate: char('plate', { length: 7 }).notNull(),
-    createdAt: timestamp('createdAt', { withTimezone: true }).notNull(),
-    number: integer('number').notNull(),
-    sequential: integer('sequential').notNull(),
-    cityId: integer('cityId')
-      .notNull()
-      .references(() => city.id),
-  },
-  (table) => ({
-    uniqueCitySequential: unique().on(table.cityId, table.sequential),
-    indexPlate: index().on(table.plate, table.sequential, table.cityId),
-  }),
-)
+export const PlateInspection = pgTable('plate_inspection', {
+	id: text('id').notNull().primaryKey(),
+	plate: text('plate').notNull(),
+	createdAt: timestamp('createdAt', { precision: 3 }).notNull(),
+	number: integer('number').notNull(),
+	sequential: integer('sequential').notNull(),
+	cityId: integer('cityId').notNull()
+}, (PlateInspection) => ({
+	'plate_inspection_city_fkey': foreignKey({
+		name: 'plate_inspection_city_fkey',
+		columns: [PlateInspection.cityId],
+		foreignColumns: [City.id]
+	})
+		.onDelete('cascade')
+		.onUpdate('cascade'),
+	'PlateInspection_cityId_sequential_unique_idx': uniqueIndex('PlateInspection_cityId_sequential_key')
+		.on(PlateInspection.cityId, PlateInspection.sequential)
+}));
+
+export const CityRelations = relations(City, ({ many }) => ({
+	plateInspections: many(PlateInspection, {
+		relationName: 'CityToPlateInspection'
+	})
+}));
+
+export const PlateInspectionRelations = relations(PlateInspection, ({ one }) => ({
+	city: one(City, {
+		relationName: 'CityToPlateInspection',
+		fields: [PlateInspection.cityId],
+		references: [City.id]
+	})
+}));

@@ -5,10 +5,10 @@ import { subMinutes } from 'date-fns'
 import { knexClient } from './knex'
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { Client } from 'pg'
-import { plateInspection } from '../db/schema'
+import { PlateInspection } from '../db/schema'
 import { and, desc, eq, sql } from 'drizzle-orm'
 
-const app = fastify({ ignoreTrailingSlash: true, caseSensitive: false })
+const app = fastify({ routerOptions: { ignoreTrailingSlash: true, caseSensitive: false } })
 const client = new Client({ connectionString: process.env.DATABASE_URL })
 client.connect()
 
@@ -37,20 +37,20 @@ app.get('/prisma-drizzle', async () => {
   try {
     const items = await prisma.$drizzle
       .select({
-        id: plateInspection.id,
-        number: plateInspection.number,
-        createdAt: plateInspection.createdAt,
-        sequential: plateInspection.sequential,
+        id: PlateInspection.id,
+        number: PlateInspection.number,
+        createdAt: PlateInspection.createdAt,
+        sequential: PlateInspection.sequential,
       })
-      .from(plateInspection)
+      .from(PlateInspection)
       .where(
         and(
-          eq(plateInspection.plate, generatePlate()),
-          eq(plateInspection.cityId, randomIntFromInterval(1, 10)),
-          sql`${plateInspection.createdAt} + '300 minute' >= NOW()`,
+          eq(PlateInspection.plate, generatePlate()),
+          eq(PlateInspection.cityId, randomIntFromInterval(1, 10)),
+          sql`${PlateInspection.createdAt} + '300 minute' >= NOW()`,
         ),
       )
-      .orderBy(desc(plateInspection.createdAt))
+      .orderBy(desc(PlateInspection.createdAt))
 
     console.log(items)
   } catch (error) {
@@ -102,20 +102,20 @@ app.get('/drizzle', async () => {
     await db.transaction(async transaction => {
       const items = await transaction
         .select({
-          id: plateInspection.id,
-          number: plateInspection.number,
-          createdAt: plateInspection.createdAt,
-          sequential: plateInspection.sequential,
+          id: PlateInspection.id,
+          number: PlateInspection.number,
+          createdAt: PlateInspection.createdAt,
+          sequential: PlateInspection.sequential,
         })
-        .from(plateInspection)
+        .from(PlateInspection)
         .where(
           and(
-            eq(plateInspection.plate, generatePlate()),
-            eq(plateInspection.cityId, randomIntFromInterval(1, 10)),
-            sql`${plateInspection.createdAt} + '300 minute' >= NOW()`,
+            eq(PlateInspection.plate, generatePlate()),
+            eq(PlateInspection.cityId, randomIntFromInterval(1, 10)),
+            sql`${PlateInspection.createdAt} + '300 minute' >= NOW()`,
           ),
         )
-        .orderBy(desc(plateInspection.createdAt))
+        .orderBy(desc(PlateInspection.createdAt))
 
       console.log(items)
     })
